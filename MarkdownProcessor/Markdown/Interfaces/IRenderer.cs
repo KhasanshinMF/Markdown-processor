@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Markdown.Classes;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace Markdown.Interfaces
 {
     internal interface IRenderer
     {
-        string Render(List<string> parsedMarkdownText);
+        string HtmlRender(List<MarkdownNode> nodes);
     }
 }

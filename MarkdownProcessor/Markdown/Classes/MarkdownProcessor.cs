@@ -12,7 +12,10 @@ namespace Markdown.Classes
 
         public string ConvertToHtml(string markdownText)
         {
-            throw new NotImplementedException("Not implemented.");
+            IParser parser = new Parser();
+            IRenderer renderer = new Renderer();
+            var parsedMarkdown = parser.Parse(markdownText);
+            return renderer.HtmlRender(parsedMarkdown);
         }
     }
 }
