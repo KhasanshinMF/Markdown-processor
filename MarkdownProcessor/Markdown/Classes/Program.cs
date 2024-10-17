@@ -13,19 +13,14 @@ namespace Markdown.Classes
         {
             var markdownText = @"
 # Заголовок 1
-## Заголовок 2
-это _курсивный текст_, а здесь __жирный__
-__жирный текст__
-_курсивный, но __жирный__ текст_
+\## Заголовок 2
+это _курсивный текст_, а здесь \__жирный\__
+\_курсивный текст\_ \__жирный текст\__
+_курсивный, но __жир\ный__ текст_
 __жирный, но _курсивный_ текст__
-просто #текст
-# Заголовок с _разными_ символами";
-
-            //var markdownText = "# заголовок";
-
+просто #текст";
             MarkdownProcessor markdownProcessor = new MarkdownProcessor();
-            Console.Write(markdownProcessor.ConvertToHtml(markdownText));
-            Console.WriteLine("Заголовок");
+            Console.WriteLine(markdownProcessor.ConvertToHtml(markdownText));
         }
     }
 }

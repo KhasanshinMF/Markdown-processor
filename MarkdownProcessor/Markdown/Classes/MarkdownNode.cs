@@ -25,10 +25,5 @@ namespace Markdown.Classes
         {
             Children.Add(child);
         }
-
-        public override string ToString()
-        {
-            return $"{Type}, {Text}";
-        }
     }
 }
