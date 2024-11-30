@@ -1,46 +1,55 @@
-﻿using Markdown.Interfaces;
-using Markdown.Enums;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Markdown.Enums;
+using Markdown.Interfaces;
 
 namespace Markdown.Classes
 {
     public class Renderer: IRenderer
     {
-        public string HtmlRender(List<MarkdownNode> nodes)
+        public string HtmlRender(List<List<Tag>> parsedMarkdownText)
         {
             var htmlText = new StringBuilder();
-            foreach (MarkdownNode node in nodes)
+            foreach (var parsedLine in parsedMarkdownText)
             {
-                htmlText.AppendLine(LineRender(node));
+                htmlText.Append(LineRender(parsedLine));
+                htmlText.Append('\n');
             }
-            htmlText.Remove(htmlText.Length - 2, 2);
 
             return htmlText.ToString();
         }
 
-        private string LineRender(MarkdownNode node)
+        private string LineRender(List<Tag> parsedLine)
         {
             var htmlLine = new StringBuilder();
 
-            foreach (MarkdownNode childNode in node.Children)
+            for (int i = 0; i < parsedLine.Count; i++)
             {
-                switch (childNode.Type)
+                switch (parsedLine[i].Type)
                 {
-                    case TagType.Header:
-                        htmlLine.Append($"<h{childNode.HeaderLevel}>{childNode.Text}</h{childNode.HeaderLevel}>");
+                    case Enums.TagType.HeaderOpen:
+                        htmlLine.Append($"<h{parsedLine[i].HeaderLevel}>");
                         break;
-                    case TagType.Bold:
-                        htmlLine.Append($"<strong>{childNode.Text}</strong>");
+                    case Enums.TagType.HeaderClose:
+                        htmlLine.Append($"</h{parsedLine[i].HeaderLevel}>");
                         break;
-                    case TagType.Italic:
-                        htmlLine.Append($"<em>{childNode.Text}</em>");
+                    case Enums.TagType.BoldOpen:
+                        htmlLine.Append("<strong>");
                         break;
-                    case TagType.Text:
-                        htmlLine.Append(childNode.Text);
+                    case Enums.TagType.BoldClose:
+                        htmlLine.Append("</strong>");
+                        break;
+                    case Enums.TagType.ItalicOpen:
+                        htmlLine.Append("<em>");
+                        break;
+                    case Enums.TagType.ItalicClose:
+                        htmlLine.Append("</em>");
+                        break;
+                    case Enums.TagType.Text:
+                        htmlLine.Append(parsedLine[i].Text);
                         break;
                 }
             }

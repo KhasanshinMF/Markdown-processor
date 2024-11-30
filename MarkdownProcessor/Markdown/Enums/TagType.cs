@@ -9,9 +9,12 @@ namespace Markdown.Enums
     public enum TagType
     {
         Root,
-        Header,
-        Bold,
-        Italic,
+        HeaderOpen,
+        HeaderClose,
+        BoldOpen,
+        BoldClose,
+        ItalicOpen,
+        ItalicClose,
         Text
     }
 }
