@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Markdown.Enums;
-
-namespace Markdown.Classes
+﻿namespace Markdown.Tags
 {
     public class Tag
     {
+        public int Index { get; }
         public TagType Type { get; }
         public int HeaderLevel { get; }
         public string Text { get; }
@@ -19,20 +13,17 @@ namespace Markdown.Classes
             HeaderLevel = headerLevel;
         }
 
-        public Tag(TagType type, string text)
+        public Tag(int index, TagType type, string text)
         {
             Type = type;
+            Index = index;
             Text = text;
         }
 
-        public Tag(TagType type)
+        public Tag(int index, TagType type)
         {
+            Index = index;
             Type = type;
-        }
-
-        public override string ToString()
-        {
-            return $"{Type}, {HeaderLevel}, {Text}";
         }
     }
 }

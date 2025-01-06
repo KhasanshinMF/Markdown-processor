@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Markdown.Enums;
-using Markdown.Interfaces;
+﻿using System.Text;
+using Markdown.Tags;
 
-namespace Markdown.Classes
+namespace Markdown.Renderers
 {
-    public class Renderer: IRenderer
+    public class Renderer
     {
         public string HtmlRender(List<List<Tag>> parsedMarkdownText)
         {
@@ -19,6 +14,7 @@ namespace Markdown.Classes
                 htmlText.Append('\n');
             }
 
+            htmlText.Remove(htmlText.Length - 1, 1);
             return htmlText.ToString();
         }
 
@@ -30,25 +26,25 @@ namespace Markdown.Classes
             {
                 switch (parsedLine[i].Type)
                 {
-                    case Enums.TagType.HeaderOpen:
+                    case TagType.HeaderOpen:
                         htmlLine.Append($"<h{parsedLine[i].HeaderLevel}>");
                         break;
-                    case Enums.TagType.HeaderClose:
+                    case TagType.HeaderClose:
                         htmlLine.Append($"</h{parsedLine[i].HeaderLevel}>");
                         break;
-                    case Enums.TagType.BoldOpen:
+                    case TagType.BoldOpen:
                         htmlLine.Append("<strong>");
                         break;
-                    case Enums.TagType.BoldClose:
+                    case TagType.BoldClose:
                         htmlLine.Append("</strong>");
                         break;
-                    case Enums.TagType.ItalicOpen:
+                    case TagType.ItalicOpen:
                         htmlLine.Append("<em>");
                         break;
-                    case Enums.TagType.ItalicClose:
+                    case TagType.ItalicClose:
                         htmlLine.Append("</em>");
                         break;
-                    case Enums.TagType.Text:
+                    case TagType.Text:
                         htmlLine.Append(parsedLine[i].Text);
                         break;
                 }

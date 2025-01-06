@@ -1,6 +1,4 @@
-﻿
-
-namespace Markdown.Interfaces
+﻿namespace Markdown.MarkdownProcessor
 {
     public interface IMarkdownProcessor
     {
