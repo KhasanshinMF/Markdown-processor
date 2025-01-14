@@ -10,7 +10,7 @@ namespace Markdown.MarkdownProcessor
             Parser parser = new Parser();
             Renderer renderer = new Renderer();
             var parsedMarkdown = parser.Parse(markdownText);
-            return renderer.HtmlRender(parsedMarkdown);
+            return renderer.ToHtml(parsedMarkdown);
         }
     }
 }

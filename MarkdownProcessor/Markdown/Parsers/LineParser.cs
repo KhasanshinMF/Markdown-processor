@@ -4,12 +4,12 @@ namespace Markdown.Parsers;
 
 public class LineParser
 {
-    private Stack<Tag> _tagStack;
-    private Stack<Tag> _textStack;
+    private readonly Stack<Tag> _tagStack;
+    private readonly Stack<Tag> _textStack;
     private bool _inHeading;
     private bool _inBold;
     private bool _inItalic;
-    private List<Tag> _parsedMarkdownLine;
+    private readonly List<Tag> _parsedMarkdownLine;
     private string _markdownLine;
 
     public LineParser(string markdownLine)
@@ -29,25 +29,25 @@ public class LineParser
         while (i < _markdownLine.Length)
         {
             if (IsEscaped(i))
-                ParsingEscapedText(ref i);
+                ParseEscaping(ref i);
 
             else if (IsHeader(i))
-                HeaderParsing(ref i);
+                ParseHeaders(ref i);
 
             else if (IsBold(i))
-                BoldParsing(ref i);
+                ParseBold(ref i);
 
             else if (IsItalic(i))
-                ItalicParsing(ref i);
+                ParseItalic(ref i);
 
-            else TextParsing(ref i);
+            else ParseText(ref i);
         }
 
         if (_inHeading)
             _parsedMarkdownLine.Add(new Tag(TagType.HeaderClose, _parsedMarkdownLine[0].HeaderLevel));
 
         if (_inItalic || _inBold)
-            HandlingUnclosedTags();
+            AddUnclosedTags();
 
         return _parsedMarkdownLine;
     }
@@ -73,7 +73,7 @@ public class LineParser
         return _markdownLine[i] == '_' && !(i + 1 < _markdownLine.Length && _markdownLine[i + 1] == '_');
     }
 
-    private void ParsingEscapedText(ref int i)
+    private void ParseEscaping(ref int i)
     {
         i++;
         var startIndex = i;
@@ -94,7 +94,7 @@ public class LineParser
             _textStack.Push(newTag);
     }
 
-    private void HeaderParsing(ref int i)
+    private void ParseHeaders(ref int i)
     {
         // Считаем уровень заголовка
         var headerLevel = 0;
@@ -111,47 +111,49 @@ public class LineParser
         _inHeading = true;
     }
 
-    private void BoldParsing(ref int i)
+    private void ParseBold(ref int i)
     {
-        if (!_inItalic && !_inBold && ClosingTagExists(TagType.BoldOpen, i))
+        if (!_inItalic && !_inBold)
         {
-            _inBold = true;
-            _tagStack.Push(new Tag(i, TagType.BoldOpen));
+            if (ClosingTagExists(TagType.BoldOpen, i))
+            {
+                _inBold = true;
+                _tagStack.Push(new Tag(i, TagType.BoldOpen));
+            }
+            else _parsedMarkdownLine.Add(new Tag(i, TagType.Text, "__"));
         }
         else if (!_inItalic && _inBold && _textStack.Count > 0)
         {
             _inBold = false;
-            stackHandler(TagType.BoldClose, i);
+            AddTextNestedInTags(TagType.BoldClose, i);
         }
-        else if (!_inItalic && !_inBold)
-            _parsedMarkdownLine.Add(new Tag(i, TagType.Text, "__"));
-
         else _textStack.Push(new Tag(i, TagType.Text, "__"));
 
         i += 2;
     }
 
-    private void ItalicParsing(ref int i)
+    private void ParseItalic(ref int i)
     {
-        if (!_inItalic && ClosingTagExists(TagType.ItalicOpen, i))
+        if (!_inItalic)
         {
-            _inItalic = true;
-            _tagStack.Push(new Tag(i, TagType.ItalicOpen));
+            if (ClosingTagExists(TagType.ItalicOpen, i))
+            {
+                _inItalic = true;
+                _tagStack.Push(new Tag(i, TagType.ItalicOpen));
+            }
+            else _parsedMarkdownLine.Add(new Tag(i, TagType.Text, "_"));
         }
         else if (_inItalic)
         {
             _inItalic = false;
-            stackHandler(TagType.ItalicClose, i);
+            AddTextNestedInTags(TagType.ItalicClose, i);
         }
-        else if (!_inItalic)
-            _parsedMarkdownLine.Add(new Tag(i, TagType.Text, "_"));
-
         else _textStack.Push(new Tag(i, TagType.Text, "_"));
 
         i++;
     }
 
-    private void stackHandler(TagType tagType, int i)
+    private void AddTextNestedInTags(TagType tagType, int i)
     {
         var tempParsedLine = new List<Tag>();
         var openingTag = _tagStack.Pop();
@@ -179,7 +181,7 @@ public class LineParser
         _parsedMarkdownLine.Add(new Tag(i, tagType));
     }
 
-    private void TextParsing(ref int i)
+    private void ParseText(ref int i)
     {
         var startIndex = i;
         while (i < _markdownLine.Length && _markdownLine[i] != '_' && !IsEscaped(i)) i++;
@@ -192,7 +194,7 @@ public class LineParser
             _parsedMarkdownLine.Add(newTag);
     }
 
-    private void HandlingUnclosedTags()
+    private void AddUnclosedTags()
     {
         var tempParsedLine = new List<Tag>();
         while (_tagStack.Count() != 0 && _textStack.Count() != 0)

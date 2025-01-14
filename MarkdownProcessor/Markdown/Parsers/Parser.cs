@@ -11,7 +11,7 @@ namespace Markdown.Parsers
 
             foreach (var line in linesOfMarkdownText)
             {
-                LineParser lineParser = new LineParser(line);
+                var lineParser = new LineParser(line);
                 parsedMarkdownText.Add(lineParser.ParseLine());
             }
 

@@ -5,12 +5,12 @@ namespace Markdown.Renderers
 {
     public class Renderer
     {
-        public string HtmlRender(List<List<Tag>> parsedMarkdownText)
+        public string ToHtml(List<List<Tag>> parsedMarkdownText)
         {
             var htmlText = new StringBuilder();
             foreach (var parsedLine in parsedMarkdownText)
             {
-                htmlText.Append(LineRender(parsedLine));
+                htmlText.Append(RenderLine(parsedLine));
                 htmlText.Append('\n');
             }
 
@@ -18,7 +18,7 @@ namespace Markdown.Renderers
             return htmlText.ToString();
         }
 
-        private string LineRender(List<Tag> parsedLine)
+        private string RenderLine(List<Tag> parsedLine)
         {
             var htmlLine = new StringBuilder();
 
