@@ -1,21 +1,23 @@
-﻿using Markdown.Tags;
+﻿using Markdown.MarkdownProcessor;
+using Markdown.Tags;
 
 namespace Markdown.Parsers
 {
     public class Parser
     {
-        public List<List<Tag>> Parse(string markdownText)
+        public Document Parse(string markdownText)
         {
-            var parsedMarkdownText = new List<List<Tag>>();
             var linesOfMarkdownText = markdownText.Split("\r\n");
+            var parsedLines = new List<Line>();
 
             foreach (var line in linesOfMarkdownText)
             {
-                var lineParser = new LineParser(line);
-                parsedMarkdownText.Add(lineParser.ParseLine());
+                var lineParser = new LineParser();
+                var tags = lineParser.ParseLine(line);
+                parsedLines.Add(tags);
             }
 
-            return parsedMarkdownText;
+            return new Document(parsedLines);
         }
     }
 }

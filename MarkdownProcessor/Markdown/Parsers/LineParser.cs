@@ -1,3 +1,4 @@
+using Markdown.MarkdownProcessor;
 using Markdown.Tags;
 
 namespace Markdown.Parsers;
@@ -9,120 +10,118 @@ public class LineParser
     private bool _inHeading;
     private bool _inBold;
     private bool _inItalic;
-    private readonly List<Tag> _parsedMarkdownLine;
-    private string _markdownLine;
+    private readonly List<Tag> _parsedLine;
 
-    public LineParser(string markdownLine)
+    public LineParser()
     {
         _tagStack = new Stack<Tag>();
         _textStack = new Stack<Tag>();
         _inHeading = false;
         _inBold = false;
         _inItalic = false;
-        _parsedMarkdownLine = new List<Tag>();
-        _markdownLine = markdownLine;
+        _parsedLine = new List<Tag>();
     }
 
-    public List<Tag> ParseLine()
+    public Line ParseLine(string line)
     {
         int i = 0;
-        while (i < _markdownLine.Length)
+        while (i < line.Length)
         {
-            if (IsEscaped(i))
-                i = ParseEscaping(i);
+            if (IsEscaped(line, i))
+                i = ParseEscaping(line, i);
 
-            else if (IsHeader(i))
-                i = ParseHeaders(i);
+            else if (IsHeader(line, i))
+                i = ParseHeaders(line, i);
 
-            else if (IsBold(i))
-                i = ParseBold(i);
+            else if (IsBold(line, i))
+                i = ParseBold(line, i);
 
-            else if (IsItalic(i))
-                i = ParseItalic(i);
+            else if (IsItalic(line, i))
+                i = ParseItalic(line, i);
 
-            else i = ParseText(i);
+            else i = ParseText(line, i);
         }
 
         if (_inHeading)
-            _parsedMarkdownLine.Add(new Tag(TagType.HeaderClose, _parsedMarkdownLine[0].HeaderLevel));
+            _parsedLine.Add(new Tag(TagType.HeaderClose, _parsedLine[0].HeaderLevel));
 
         if (_inItalic || _inBold)
             AddUnclosedTags();
 
-        return _parsedMarkdownLine;
+        return new Line(_parsedLine);
     }
 
-    private bool IsEscaped(int i)
+    private bool IsEscaped(string line, int i)
     {
-        return _markdownLine[i] == '\\' && i + 1 < _markdownLine.Length &&
-               (_markdownLine[i + 1] == '#' || _markdownLine[i + 1] == '_' || _markdownLine[i + 1] == '\\');
+        return line[i] == '\\' && i + 1 < line.Length &&
+               (line[i + 1] == '#' || line[i + 1] == '_' || line[i + 1] == '\\');
     }
 
-    private bool IsHeader(int i)
+    private bool IsHeader(string line, int i)
     {
-        return _markdownLine[i] == '#' && (i == 0 || _markdownLine[i - 1] == '\n' || _markdownLine[i - 1] == '\r');
+        return line[i] == '#' && (i == 0 || line[i - 1] == '\n' || line[i - 1] == '\r');
     }
 
-    private bool IsBold(int i)
+    private bool IsBold(string line, int i)
     {
-        return i + 1 < _markdownLine.Length && _markdownLine[i] == '_' && _markdownLine[i + 1] == '_';
+        return i + 1 < line.Length && line[i] == '_' && line[i + 1] == '_';
     }
 
-    private bool IsItalic(int i)
+    private bool IsItalic(string line, int i)
     {
-        return _markdownLine[i] == '_' && !(i + 1 < _markdownLine.Length && _markdownLine[i + 1] == '_');
+        return line[i] == '_' && !(i + 1 < line.Length && line[i + 1] == '_');
     }
 
-    private int ParseEscaping(int i)
+    private int ParseEscaping(string line, int i)
     {
         i++;
         var startIndex = i;
 
-        if (_markdownLine[i] == '\\' || IsItalic(i)) i++;
-        else if (IsBold(i)) i += 2;
+        if (line[i] == '\\' || IsItalic(line, i)) i++;
+        else if (IsBold(line, i)) i += 2;
 
-        while (i < _markdownLine.Length &&
-               _markdownLine[i] != '_' &&
-               _markdownLine[i] != '\\') i++;
+        while (i < line.Length &&
+               line[i] != '_' &&
+               line[i] != '\\') i++;
 
         var newTag = new Tag(startIndex - 1, TagType.Text,
-            _markdownLine.Substring(startIndex, i - startIndex));
+            line.Substring(startIndex, i - startIndex));
 
         if (_textStack.Count == 0)
-            _parsedMarkdownLine.Add(newTag);
+            _parsedLine.Add(newTag);
         else
             _textStack.Push(newTag);
         return i;
     }
 
-    private int ParseHeaders(int i)
+    private int ParseHeaders(string line, int i)
     {
         // Считаем уровень заголовка
         var headerLevel = 0;
-        while (i < _markdownLine.Length && _markdownLine[i] == '#' && headerLevel < 6)
+        while (i < line.Length && line[i] == '#' && headerLevel < 6)
         {
             headerLevel++;
             i++;
         }
 
         // Пропускаем пробелы между тэгом и текстом
-        while (i < _markdownLine.Length && _markdownLine[i] == ' ') i++;
+        while (i < line.Length && line[i] == ' ') i++;
 
-        _parsedMarkdownLine.Add(new Tag(TagType.HeaderOpen, headerLevel));
+        _parsedLine.Add(new Tag(TagType.HeaderOpen, headerLevel));
         _inHeading = true;
         return i;
     }
 
-    private int ParseBold(int i)
+    private int ParseBold(string line, int i)
     {
         if (!_inItalic && !_inBold)
         {
-            if (ClosingTagExists(TagType.BoldOpen, i))
+            if (ClosingTagExists(line, TagType.BoldOpen, i))
             {
                 _inBold = true;
                 _tagStack.Push(new Tag(i, TagType.BoldOpen));
             }
-            else _parsedMarkdownLine.Add(new Tag(i, TagType.Text, "__"));
+            else _parsedLine.Add(new Tag(i, TagType.Text, "__"));
         }
         else if (!_inItalic && _inBold && _textStack.Count > 0)
         {
@@ -136,16 +135,16 @@ public class LineParser
         return i;
     }
 
-    private int ParseItalic(int i)
+    private int ParseItalic(string line,int i)
     {
         if (!_inItalic)
         {
-            if (ClosingTagExists(TagType.ItalicOpen, i))
+            if (ClosingTagExists(line, TagType.ItalicOpen, i))
             {
                 _inItalic = true;
                 _tagStack.Push(new Tag(i, TagType.ItalicOpen));
             }
-            else _parsedMarkdownLine.Add(new Tag(i, TagType.Text, "_"));
+            else _parsedLine.Add(new Tag(i, TagType.Text, "_"));
         }
         else if (_inItalic)
         {
@@ -162,14 +161,14 @@ public class LineParser
     {
         var tempParsedLine = new List<Tag>();
         var openingTag = _tagStack.Pop();
-        var text = _textStack.Peek();
+        var textTag = _textStack.Peek();
 
-        while (openingTag.Index < text.Index)
+        while (openingTag.Index < textTag.Index)
         {
-            tempParsedLine.Add(text);
+            tempParsedLine.Add(textTag);
             _textStack.Pop();
             if (_textStack.Count == 0) break;
-            text = _textStack.Peek();
+            textTag = _textStack.Peek();
         }
 
         if (tagType == TagType.ItalicClose && _inBold)
@@ -182,21 +181,21 @@ public class LineParser
 
         tempParsedLine.Add(openingTag);
         tempParsedLine.Reverse();
-        _parsedMarkdownLine.AddRange(tempParsedLine);
-        _parsedMarkdownLine.Add(new Tag(i, tagType));
+        _parsedLine.AddRange(tempParsedLine);
+        _parsedLine.Add(new Tag(i, tagType));
     }
 
-    private int ParseText(int i)
+    private int ParseText(string line, int i)
     {
         var startIndex = i;
-        while (i < _markdownLine.Length && _markdownLine[i] != '_' && !IsEscaped(i)) i++;
+        while (i < line.Length && line[i] != '_' && !IsEscaped(line, i)) i++;
 
-        var newTag = new Tag(startIndex, TagType.Text, _markdownLine.Substring(startIndex, i - startIndex));
+        var newTag = new Tag(startIndex, TagType.Text, line.Substring(startIndex, i - startIndex));
 
         if (_tagStack.Count != 0)
             _textStack.Push(newTag);
         else
-            _parsedMarkdownLine.Add(newTag);
+            _parsedLine.Add(newTag);
 
         return i;
     }
@@ -215,27 +214,27 @@ public class LineParser
             tempParsedLine.Insert(0, unclosedTag);
         }
 
-        _parsedMarkdownLine.AddRange(tempParsedLine);
+        _parsedLine.AddRange(tempParsedLine);
     }
 
-    private bool ClosingTagExists(TagType tagType, int i)
+    private bool ClosingTagExists(string line, TagType tagType, int i)
     {
         if (tagType == TagType.ItalicOpen)
         {
             i++;
-            while (i < _markdownLine.Length)
+            while (i < line.Length)
             {
-                if (IsBold(i)) i += 2;
-                else if (IsItalic(i)) return true;
+                if (IsBold(line, i)) i += 2;
+                else if (IsItalic(line, i)) return true;
                 i++;
             }
         }
         else if (tagType == TagType.BoldOpen)
         {
             i += 2;
-            while (i < _markdownLine.Length)
+            while (i < line.Length)
             {
-                if (IsBold(i)) return true;
+                if (IsBold(line, i)) return true;
                 i++;
             }
         }

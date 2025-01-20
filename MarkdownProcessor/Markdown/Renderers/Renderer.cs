@@ -1,36 +1,39 @@
 ﻿using System.Text;
+using Markdown.MarkdownProcessor;
 using Markdown.Tags;
 
 namespace Markdown.Renderers
 {
     public class Renderer
     {
-        public string ToHtml(List<List<Tag>> parsedMarkdownText)
+        public string ToHtml(Document document)
         {
             var htmlText = new StringBuilder();
-            foreach (var parsedLine in parsedMarkdownText)
+            foreach (var line in document.Lines)
             {
-                htmlText.Append(RenderLine(parsedLine));
+                htmlText.Append(RenderLine(line));
                 htmlText.Append('\n');
             }
 
-            htmlText.Remove(htmlText.Length - 1, 1);
+            if (htmlText.Length > 0)
+                htmlText.Remove(htmlText.Length - 1, 1);
+
             return htmlText.ToString();
         }
 
-        private string RenderLine(List<Tag> parsedLine)
+        private string RenderLine(Line line)
         {
             var htmlLine = new StringBuilder();
 
-            for (int i = 0; i < parsedLine.Count; i++)
+            foreach (var tag in line.Tags)
             {
-                switch (parsedLine[i].Type)
+                switch (tag.Type)
                 {
                     case TagType.HeaderOpen:
-                        htmlLine.Append($"<h{parsedLine[i].HeaderLevel}>");
+                        htmlLine.Append($"<h{tag.HeaderLevel}>");
                         break;
                     case TagType.HeaderClose:
-                        htmlLine.Append($"</h{parsedLine[i].HeaderLevel}>");
+                        htmlLine.Append($"</h{tag.HeaderLevel}>");
                         break;
                     case TagType.BoldOpen:
                         htmlLine.Append("<strong>");
@@ -45,7 +48,7 @@ namespace Markdown.Renderers
                         htmlLine.Append("</em>");
                         break;
                     case TagType.Text:
-                        htmlLine.Append(parsedLine[i].Text);
+                        htmlLine.Append(tag.Text);
                         break;
                 }
             }
