@@ -5,50 +5,35 @@ namespace Markdown.Parsers;
 
 public class LineParser
 {
-    private readonly Stack<Tag> _tagStack;
-    private readonly Stack<Tag> _textStack;
-    private bool _inHeading;
-    private bool _inBold;
-    private bool _inItalic;
-    private readonly List<Tag> _parsedLine;
-
-    public LineParser()
-    {
-        _tagStack = new Stack<Tag>();
-        _textStack = new Stack<Tag>();
-        _inHeading = false;
-        _inBold = false;
-        _inItalic = false;
-        _parsedLine = new List<Tag>();
-    }
-
     public Line ParseLine(string line)
     {
+        var state = new ParsingState();
+        
         int i = 0;
         while (i < line.Length)
         {
             if (IsEscaped(line, i))
-                i = ParseEscaping(line, i);
+                i = ParseEscaping(line, i, state);
 
             else if (IsHeader(line, i))
-                i = ParseHeaders(line, i);
+                i = ParseHeaders(line, i, state);
 
             else if (IsBold(line, i))
-                i = ParseBold(line, i);
+                i = ParseBold(line, i, state);
 
             else if (IsItalic(line, i))
-                i = ParseItalic(line, i);
+                i = ParseItalic(line, i, state);
 
-            else i = ParseText(line, i);
+            else i = ParseText(line, i, state);
         }
 
-        if (_inHeading)
-            _parsedLine.Add(new Tag(TagType.HeaderClose, _parsedLine[0].HeaderLevel));
+        if (state.InHeading)
+            state.ParsedTags.Add(new Tag(TagType.HeaderClose, state.ParsedTags[0].HeaderLevel));
 
-        if (_inItalic || _inBold)
-            AddUnclosedTags();
+        if (state.InItalic || state.InBold)
+            AddUnclosedTags(state);
 
-        return new Line(_parsedLine);
+        return new Line(state.ParsedTags);
     }
 
     private bool IsEscaped(string line, int i)
@@ -72,7 +57,7 @@ public class LineParser
         return line[i] == '_' && !(i + 1 < line.Length && line[i + 1] == '_');
     }
 
-    private int ParseEscaping(string line, int i)
+    private int ParseEscaping(string line, int i, ParsingState state)
     {
         i++;
         var startIndex = i;
@@ -87,14 +72,14 @@ public class LineParser
         var newTag = new Tag(startIndex - 1, TagType.Text,
             line.Substring(startIndex, i - startIndex));
 
-        if (_textStack.Count == 0)
-            _parsedLine.Add(newTag);
+        if (state.TextStack.Count == 0)
+            state.ParsedTags.Add(newTag);
         else
-            _textStack.Push(newTag);
+            state.TextStack.Push(newTag);
         return i;
     }
 
-    private int ParseHeaders(string line, int i)
+    private int ParseHeaders(string line, int i, ParsingState state)
     {
         // Считаем уровень заголовка
         var headerLevel = 0;
@@ -107,106 +92,106 @@ public class LineParser
         // Пропускаем пробелы между тэгом и текстом
         while (i < line.Length && line[i] == ' ') i++;
 
-        _parsedLine.Add(new Tag(TagType.HeaderOpen, headerLevel));
-        _inHeading = true;
+        state.ParsedTags.Add(new Tag(TagType.HeaderOpen, headerLevel));
+        state.InHeading = true;
         return i;
     }
 
-    private int ParseBold(string line, int i)
+    private int ParseBold(string line, int i, ParsingState state)
     {
-        if (!_inItalic && !_inBold)
+        if (!state.InItalic && !state.InBold)
         {
             if (ClosingTagExists(line, TagType.BoldOpen, i))
             {
-                _inBold = true;
-                _tagStack.Push(new Tag(i, TagType.BoldOpen));
+                state.InBold = true;
+                state.TagStack.Push(new Tag(i, TagType.BoldOpen));
             }
-            else _parsedLine.Add(new Tag(i, TagType.Text, "__"));
+            else state.ParsedTags.Add(new Tag(i, TagType.Text, "__"));
         }
-        else if (!_inItalic && _inBold && _textStack.Count > 0)
+        else if (!state.InItalic && state.InBold && state.TextStack.Count > 0)
         {
-            _inBold = false;
-            AddTextNestedInTags(TagType.BoldClose, i);
+            state.InBold = false;
+            AddTextNestedInTags(TagType.BoldClose, i, state);
         }
-        else _textStack.Push(new Tag(i, TagType.Text, "__"));
+        else state.TextStack.Push(new Tag(i, TagType.Text, "__"));
         
         i += 2;
         
         return i;
     }
 
-    private int ParseItalic(string line,int i)
+    private int ParseItalic(string line,int i, ParsingState state)
     {
-        if (!_inItalic)
+        if (!state.InItalic)
         {
             if (ClosingTagExists(line, TagType.ItalicOpen, i))
             {
-                _inItalic = true;
-                _tagStack.Push(new Tag(i, TagType.ItalicOpen));
+                state.InItalic = true;
+                state.TagStack.Push(new Tag(i, TagType.ItalicOpen));
             }
-            else _parsedLine.Add(new Tag(i, TagType.Text, "_"));
+            else state.ParsedTags.Add(new Tag(i, TagType.Text, "_"));
         }
-        else if (_inItalic)
+        else if (state.InItalic)
         {
-            _inItalic = false;
-            AddTextNestedInTags(TagType.ItalicClose, i);
+            state.InItalic = false;
+            AddTextNestedInTags(TagType.ItalicClose, i, state);
         }
-        else _textStack.Push(new Tag(i, TagType.Text, "_"));
+        else state.TextStack.Push(new Tag(i, TagType.Text, "_"));
 
         i++;
         return i;
     }
 
-    private void AddTextNestedInTags(TagType tagType, int i)
+    private void AddTextNestedInTags(TagType tagType, int i, ParsingState state)
     {
         var tempParsedLine = new List<Tag>();
-        var openingTag = _tagStack.Pop();
-        var textTag = _textStack.Peek();
+        var openingTag = state.TagStack.Pop();
+        var textTag = state.TextStack.Peek();
 
         while (openingTag.Index < textTag.Index)
         {
             tempParsedLine.Add(textTag);
-            _textStack.Pop();
-            if (_textStack.Count == 0) break;
-            textTag = _textStack.Peek();
+            state.TextStack.Pop();
+            if (state.TextStack.Count == 0) break;
+            textTag = state.TextStack.Peek();
         }
 
-        if (tagType == TagType.ItalicClose && _inBold)
+        if (tagType == TagType.ItalicClose && state.InBold)
         {
-            _textStack.Push(openingTag);
+            state.TextStack.Push(openingTag);
             tempParsedLine.Add(new Tag(i, tagType));
-            tempParsedLine.ForEach(_textStack.Push);
+            tempParsedLine.ForEach(state.TextStack.Push);
             return;
         }
 
         tempParsedLine.Add(openingTag);
         tempParsedLine.Reverse();
-        _parsedLine.AddRange(tempParsedLine);
-        _parsedLine.Add(new Tag(i, tagType));
+        state.ParsedTags.AddRange(tempParsedLine);
+        state.ParsedTags.Add(new Tag(i, tagType));
     }
 
-    private int ParseText(string line, int i)
+    private int ParseText(string line, int i, ParsingState state)
     {
         var startIndex = i;
         while (i < line.Length && line[i] != '_' && !IsEscaped(line, i)) i++;
 
         var newTag = new Tag(startIndex, TagType.Text, line.Substring(startIndex, i - startIndex));
 
-        if (_tagStack.Count != 0)
-            _textStack.Push(newTag);
+        if (state.TagStack.Count != 0)
+            state.TextStack.Push(newTag);
         else
-            _parsedLine.Add(newTag);
+            state.ParsedTags.Add(newTag);
 
         return i;
     }
 
-    private void AddUnclosedTags()
+    private void AddUnclosedTags(ParsingState state)
     {
         var tempParsedLine = new List<Tag>();
-        while (_tagStack.Count() != 0 && _textStack.Count() != 0)
+        while (state.TagStack.Count() != 0 && state.TextStack.Count() != 0)
         {
-            var text = _textStack.Pop();
-            var unclosedTag = _tagStack.Pop();
+            var text = state.TextStack.Pop();
+            var unclosedTag = state.TagStack.Pop();
 
             unclosedTag = new Tag(unclosedTag.Index, TagType.Text, unclosedTag.Type == TagType.BoldOpen ? "__" : "_");
 
@@ -214,7 +199,7 @@ public class LineParser
             tempParsedLine.Insert(0, unclosedTag);
         }
 
-        _parsedLine.AddRange(tempParsedLine);
+        state.ParsedTags.AddRange(tempParsedLine);
     }
 
     private bool ClosingTagExists(string line, TagType tagType, int i)
