@@ -11,9 +11,10 @@
       - s3
     environment:
       - ConnectionStrings:DefaultConnection=Host=localhost;Port=5432;Database=MarkdownProcessor;Username=postgres;Password=1234;;
-      - AWS:S3:ServiceURL=http://s3:9000
-      - AWS:S3:AccessKey=your_access_key
-      - AWS:S3:SecretKey=your_secret_key
+      - AWS:S3:ServiceURL=http://127.0.0.1:9000
+      - AWS:S3:AccessKey=p2KsogpfaxbMFGTL75jd
+      - AWS:S3:SecretKey=6ExsJUsyslH3DlEEyb0T7c0pgO0CIE4yd56zNn2R
+      - AWS:S3:BucketName=markdown-documents
   
   db:
     image: postgres:16
@@ -22,7 +23,7 @@
       POSTGRES_PASSWORD: 1234
       POSTGRES_DB: MarkdownProcessor
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -30,11 +31,13 @@
     image: minio/minio
     ports:
       - "9000:9000"
+      - "9001:9001"
     environment:
-      MINIO_ROOT_USER: your_access_key
-      MINIO_ROOT_PASSWORD: your_secret_key
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
     volumes:
       - s3_data:/data
+    command: server /data --console-address ":9001"
 
 volumes:
   postgres_data:

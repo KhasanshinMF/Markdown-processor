@@ -39,6 +39,10 @@ namespace Web.Migrations
                     b.Property<bool>("IsPublic")
                         .HasColumnType("boolean");
 
+                    b.Property<string>("MinIOKey")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("text");
@@ -61,9 +65,14 @@ namespace Web.Migrations
                     b.Property<int>("AccessLevel")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("UserId1")
+                        .HasColumnType("integer");
+
                     b.HasKey("DocumentId", "UserId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("DocumentAccesses");
                 });
@@ -113,10 +122,14 @@ namespace Web.Migrations
                         .IsRequired();
 
                     b.HasOne("MarkdownProcessorWeb.Models.User", "User")
-                        .WithMany("DocumentAccesses")
+                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("MarkdownProcessorWeb.Models.User", null)
+                        .WithMany("DocumentAccesses")
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("Document");
 

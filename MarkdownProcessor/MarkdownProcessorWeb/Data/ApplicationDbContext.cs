@@ -23,6 +23,16 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<DocumentAccess>()
             .HasKey(da => new { da.DocumentId, da.UserId });
         
+        modelBuilder.Entity<DocumentAccess>()
+            .HasOne(da => da.Document)
+            .WithMany(d => d.DocumentAccesses)
+            .HasForeignKey(da => da.DocumentId);
+
+        modelBuilder.Entity<DocumentAccess>()
+            .HasOne(da => da.User)
+            .WithMany()
+            .HasForeignKey(da => da.UserId);
+        
         base.OnModelCreating(modelBuilder);
     }
 }

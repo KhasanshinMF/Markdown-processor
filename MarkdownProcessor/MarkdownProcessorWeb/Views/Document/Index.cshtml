@@ -1,0 +1,51 @@
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+
+@model List<MarkdownProcessorWeb.Models.Document>
+
+@{
+    ViewData["Title"] = "Мои документы";
+}
+
+<h2>Мои документы</h2>
+
+<a href="/Document/Create" class="btn btn-primary">Создать документ</a>
+
+<table class="table mt-4">
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var document in Model)
+    {
+        <tr>
+            <td>@document.Title</td>
+            <td>
+                <a href="/Document/Read/@document.Id" class="btn btn-info">Просмотр</a>
+                @if (document.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) 
+                     || document.DocumentAccesses.Any(da => da.UserId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) 
+                                                            && da.AccessLevel == AccessLevel.Editor))
+                {
+                    <a href="/Document/Edit/@document.Id" class="btn btn-warning">Редактировать</a>
+                }
+                @if (document.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
+                {
+                    <form asp-action="Delete" asp-controller="Document" method="post" class="d-inline">
+                        <input type="hidden" name="id" value="@document.Id"/>
+                        <button type="submit" class="btn btn-danger">Удалить</button>
+                    </form>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<div class="mt-4">
+    <form asp-action="Logout" asp-controller="Account" method="post">
+        <button type="submit" class="btn btn-danger">Выйти</button>
+    </form>
+</div>

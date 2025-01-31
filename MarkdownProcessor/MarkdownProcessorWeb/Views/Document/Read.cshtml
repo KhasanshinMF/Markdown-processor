@@ -1,0 +1,13 @@
+@model MarkdownProcessorWeb.Models.Document
+
+@{
+    ViewData["Title"] = "Просмотр документа";
+}
+
+<h2>@Model.Title</h2>
+
+<div class="mt-4">
+    <pre>@Model.Content</pre>
+</div>
+
+<a href="/Document/Index" class="btn btn-secondary">Назад к списку</a>

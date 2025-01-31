@@ -1,10 +1,8 @@
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using MarkdownProcessorWeb.Models;
 
 namespace MarkdownProcessorWeb.Controllers;
 
-public class HomeController : Controller
+public class GreetingController : Controller
 {
     public IActionResult Index()
     {

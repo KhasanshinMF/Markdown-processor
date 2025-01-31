@@ -33,7 +33,7 @@ public class AccountController : Controller
             {
                 var user = await _authService.RegisterAsync(model.Email, model.Username, model.Password);
                 await SignInUserAsync(user, model.RememberMe);
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("Index", "Greeting");
             }
             catch (Exception e)
             {
@@ -58,7 +58,7 @@ public class AccountController : Controller
             {
                 var user = await _authService.LoginAsync(model.Email, model.Password);
                 await SignInUserAsync(user, model.RememberMe);
-                return RedirectToAction("Index", "Main");
+                return RedirectToAction("Index", "Document");
             }
             catch (Exception e)
             {
@@ -103,7 +103,7 @@ public class AccountController : Controller
         }
 
         await SignInUserAsync(user, false);
-        return RedirectToAction("Index", "Main");
+        return RedirectToAction("Index", "Document");
     }
 
 
@@ -111,8 +111,7 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-        
-        return RedirectToAction("Index", "Home");
+        return RedirectToAction("Index", "Greeting");
     }
 
     private async Task SignInUserAsync(User user, bool rememberMe)
