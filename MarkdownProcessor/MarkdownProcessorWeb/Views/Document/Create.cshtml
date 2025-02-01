@@ -12,14 +12,10 @@
         <input asp-for="Title" class="form-control" />
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-    <div class="form-group">
-        <label asp-for="Content"></label>
-        <textarea asp-for="Content" class="form-control" rows="10"></textarea>
-        <span asp-validation-for="Content" class="text-danger"></span>
-    </div>
     <div class="form-group form-check">
         <input asp-for="IsPublic" class="form-check-input" />
         <label asp-for="IsPublic" class="form-check-label">Публичный документ</label>
     </div>
+    <input type="hidden" asp-for="Content" value="# Новый документ" />
     <button type="submit" class="btn btn-primary">Создать</button>
 </form>

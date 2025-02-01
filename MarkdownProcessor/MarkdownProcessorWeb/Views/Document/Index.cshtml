@@ -14,23 +14,39 @@
 <table class="table mt-4">
     <thead>
     <tr>
-        <th>Название</th>
-        <th>Действия</th>
+        <th></th>
+        <th></th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
     @foreach (var document in Model)
     {
         <tr>
-            <td>@document.Title</td>
             <td>
-                <a href="/Document/Read/@document.Id" class="btn btn-info">Просмотр</a>
-                @if (document.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) 
-                     || document.DocumentAccesses.Any(da => da.UserId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)) 
-                                                            && da.AccessLevel == AccessLevel.Editor))
+                @if (document.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
+                     || document.DocumentAccesses.Any(da =>
+                         da.UserId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
+                         && da.AccessLevel == AccessLevel.Editor))
                 {
-                    <a href="/Document/Edit/@document.Id" class="btn btn-warning">Редактировать</a>
+                    <a href="/Document/Edit/@document.Id">@document.Title</a>
                 }
+                else
+                {
+                    <a href="/Document/Read/@document.Id">@document.Title</a>
+                }
+            </td>
+            <td>
+                @if (document.IsPublic)
+                {
+                    <p>Публичный</p>
+                }
+                else
+                {
+                    <p>Приватный</p>
+                }
+            </td>
+            <td>
                 @if (document.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
                 {
                     <form asp-action="Delete" asp-controller="Document" method="post" class="d-inline">
