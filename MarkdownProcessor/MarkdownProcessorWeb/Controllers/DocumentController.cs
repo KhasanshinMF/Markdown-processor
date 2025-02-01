@@ -128,7 +128,7 @@ public class DocumentController : Controller
             _context.Documents.Update(document);
             await _context.SaveChangesAsync();
             
-            return RedirectToAction("Index");
+            return View(model);
         }
         
         return View(model);
