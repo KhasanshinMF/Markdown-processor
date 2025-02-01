@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Markdown.MarkdownProcessor;
 using MarkdownProcessorWeb.Models;
 using MarkdownProcessorWeb.Services;
 using MarkdownProcessorWeb.ViewModels;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Web.Data;
+using Document = MarkdownProcessorWeb.Models.Document;
 
 namespace MarkdownProcessorWeb.Controllers;
 
@@ -14,11 +16,13 @@ public class DocumentController : Controller
 {
     private readonly ApplicationDbContext _context;
     private readonly MinIOStorageService _minioStorageService;
+    private readonly IMarkdownProcessor _markdownProcessor;
 
-    public DocumentController(ApplicationDbContext context, MinIOStorageService minioStorageService)
+    public DocumentController(ApplicationDbContext context, MinIOStorageService minioStorageService, IMarkdownProcessor markdownProcessor)
     {
         _context = context;
         _minioStorageService = minioStorageService;
+        _markdownProcessor = markdownProcessor;
     }
 
     public async Task<IActionResult> Index()
@@ -165,6 +169,15 @@ public class DocumentController : Controller
         await _context.SaveChangesAsync();
         
         return RedirectToAction("Index");
+    }
+    
+    [HttpPost]
+    public IActionResult ConvertToHtml([FromBody] string markdown)
+    {
+        markdown = markdown.Replace("\n", "\r\n");
+        
+        var html = _markdownProcessor.ConvertToHtml(markdown);
+        return Content(html, "text/plain");
     }
     
 }

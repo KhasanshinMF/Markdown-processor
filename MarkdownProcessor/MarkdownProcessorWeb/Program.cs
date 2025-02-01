@@ -1,3 +1,4 @@
+using Markdown.MarkdownProcessor;
 using MarkdownProcessorWeb.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 var configuration = builder.Configuration;
 
 builder.Services.AddSingleton<MinIOStorageService>();
+
+builder.Services.AddSingleton<IMarkdownProcessor, MarkdownProcessor>();
 
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddSingleton<IPasswordHasher<User>, PasswordHasher<User>>();
