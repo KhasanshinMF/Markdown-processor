@@ -8,6 +8,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<Document> Documents { get; set; }
     public DbSet<DocumentAccess> DocumentAccesses { get; set; }
+    public DbSet<DocumentShareLink> DocumentShareLinks { get; set; }
     
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -32,6 +33,11 @@ public class ApplicationDbContext : DbContext
             .HasOne(da => da.User)
             .WithMany()
             .HasForeignKey(da => da.UserId);
+
+        modelBuilder.Entity<DocumentShareLink>()
+            .HasOne(sl => sl.Document)
+            .WithMany()
+            .HasForeignKey(sl => sl.DocumentId);
         
         base.OnModelCreating(modelBuilder);
     }

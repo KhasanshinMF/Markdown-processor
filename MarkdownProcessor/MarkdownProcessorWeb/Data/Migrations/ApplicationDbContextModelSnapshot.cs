@@ -77,6 +77,28 @@ namespace Web.Migrations
                     b.ToTable("DocumentAccesses");
                 });
 
+            modelBuilder.Entity("MarkdownProcessorWeb.Models.DocumentShareLink", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DocumentId")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DocumentId");
+
+                    b.ToTable("DocumentShareLinks");
+                });
+
             modelBuilder.Entity("MarkdownProcessorWeb.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -134,6 +156,17 @@ namespace Web.Migrations
                     b.Navigation("Document");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("MarkdownProcessorWeb.Models.DocumentShareLink", b =>
+                {
+                    b.HasOne("MarkdownProcessorWeb.Models.Document", "Document")
+                        .WithMany()
+                        .HasForeignKey("DocumentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Document");
                 });
 
             modelBuilder.Entity("MarkdownProcessorWeb.Models.Document", b =>
