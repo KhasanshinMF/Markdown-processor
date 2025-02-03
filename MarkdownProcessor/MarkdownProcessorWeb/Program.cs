@@ -49,7 +49,7 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Shared/Error");
     app.UseHsts();
 }
-
+        
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
