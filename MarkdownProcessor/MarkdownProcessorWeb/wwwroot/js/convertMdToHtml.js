@@ -15,11 +15,19 @@ function convertMarkdownToHtml() {
             return response.text();
         })
         .then(text => {
-            document.getElementById('html-content').textContent = text;
+            const showCode = document.getElementById("show-code-checkbox").checked;
+
+            if (showCode) {
+                document.getElementById('html-content').textContent = text;
+            }
+            else {
+                document.getElementById('html-content').innerHTML = text;
+            }          
+            
         })
         .catch(error => {
             console.error('Ошибка:', error);
-            document.getElementById('html-content').textContent = 'Ошибка при конвертации: ' + error.message;
+            document.getElementById('html-content').textContent = error.message;
         });
 }
 
@@ -32,5 +40,6 @@ function debounce(func, wait) {
 }
 
 document.getElementById('markdown-content').addEventListener('input', debounce(convertMarkdownToHtml, 300));
+document.getElementById('show-code-checkbox').addEventListener('change', convertMarkdownToHtml);
 
 setTimeout(convertMarkdownToHtml(), 100);
