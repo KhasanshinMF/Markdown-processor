@@ -1,21 +1,29 @@
 @model MarkdownProcessorWeb.ViewModels.LoginViewModel
 
-<h2>Вход</h2>
+@{
+ViewData["Title"] = "Вход";
+}
 
-<form asp-action="Login" method="post">
-    <div class="form-group">
-        <label asp-for="Email"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
+<div class="d-flex justify-content-center align-items-center vh-custom">
+    <div class="text-center">
+        <h2>Вход</h2>
+        <form asp-action="Login" method="post">
+            <div class="form-group mb-1">
+                <p class="mb-1">Email</p>
+                <input asp-for="Email" class="form-control"/>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-1">
+                <p class="mb-1">Пароль</p>
+                <input asp-for="Password" type="password" class="form-control"/>
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-1">
+                <label asp-for="RememberMe"></label>
+                <input asp-for="RememberMe" type="checkbox"/>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mb-2">Войти</button>
+            <a href="/Greeting/Index" class="btn btn-danger w-100">Назад</a>
+        </form>
     </div>
-    <div class="form-group">
-        <label asp-for="Password"></label>
-        <input asp-for="Password" type="password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
-    <div class="form-group">
-        <label asp-for="RememberMe"></label>
-        <input asp-for="RememberMe" />
-    </div>
-    <button type="submit" class="btn btn-primary">Войти</button>
-</form>
+</div>

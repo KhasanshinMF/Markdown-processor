@@ -4,12 +4,12 @@ html {
 
 @media (min-width: 768px) {
   html {
-    font-size: 16px;
+    font-size: 18px;
   }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #333333;
 }
 
 html {
@@ -19,6 +19,8 @@ html {
 
 body {
   margin-bottom: 60px;
+  background-color: #111827;
+  color: #E5E7EB;
 }
 
 .form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
@@ -28,4 +30,114 @@ body {
 
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+a {
+  color: #5145CD;
+}
+
+.btn-primary {
+  color: #E5E7EB;
+  background-color: #5145CD;
+  border-color: #5145CD;
+}
+.btn-primary:hover {
+  background-color: #42389D;
+  border-color: #42389D;
+}
+.btn-primary:active {
+  background-color: #362F78;
+  border-color: #362F78
+}
+
+.navbar, .footer {
+  color: #E5E7EB;
+  background: #1F2937;
+  border-bottom: 1px solid #4B5563;
+}
+
+.text-light-gray {
+  color: #E5E7EB;
+}
+
+.custom-margin-top {
+  margin-top: 15%;
+}
+
+.vh-custom {
+  height: 75vh;
+}
+
+.width-button {
+  width: 73%;
+}
+
+.rounded-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.delete-btn {
+  float: right;
+  margin-left: 10px;
+}
+.rounded-table tbody tr td {
+  padding: 12px;
+  border-bottom: 1px solid #4B5563;
+}
+.rounded-table {
+  background: #1F2937;
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid #4B5563;
+}
+
+.form-control {
+  background-color: #1F2937;
+  color: #E5E7EB;
+  border: 1px solid #4B5563;
+  border-radius: 4px;
+  padding: 8px;
+}
+textarea.form-control {
+  resize: vertical;
+}
+
+pre.form-control {
+  background-color: #1F2937;
+  color: #E5E7EB;
+  border: 1px solid #4B5563;
+  border-radius: 4px;
+  padding: 8px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.form-control:hover {
+  border-color: #1F2937;
+}
+
+.form-control:focus {
+  background-color: #1F2937;
+  color: #E5E7EB;
+  border-color: #1F2937;
+  box-shadow: 0 0 0 2px #362F78;
+}
+
+.modal-color {
+  background-color: #111827;
+  color: #E5E7EB;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 1000px #1F2937 inset;
+  -webkit-text-fill-color: #E5E7EB;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.text-decoration {
+  text-decoration: none;
 }

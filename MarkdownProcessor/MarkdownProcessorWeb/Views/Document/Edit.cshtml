@@ -6,66 +6,60 @@
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
 
 <form asp-action="Edit" method="post">
     <input type="hidden" asp-for="Id"/>
-    <div class="form-group">
-        <h4>
-            <label asp-for="Title"></label>
-        </h4>
+    <div class="form-group mb-2">
+        <h4><p class="mb-2">Название</p></h4>
         <input asp-for="Title" class="form-control"/>
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-    <div class="form-group row">
+    <div class="form-group row mb-2">
         <div class="col-md-6">
             <h4>Markdown</h4>
-            <textarea id="markdown-content" asp-for="Content" class="form-control" rows="16"></textarea>
+            <textarea id="markdown-content" asp-for="Content" class="form-control" style="height: 470px; overflow-y: auto"></textarea>
             <span asp-validation-for="Content" class="text-danger"></span>
         </div>
         <div class="col-md-6">
             <h4>HTML</h4>
-            <pre id="html-content" class="form-control" style="height: 400px; overflow-y: auto; white-space: pre-wrap;"></pre>
+            <pre id="html-content" class="form-control" style="height: 470px; overflow-y: auto; white-space: pre-wrap;"></pre>
         </div>
     </div>
-    <div class="form-group form-check">
+    <div class="form-group form-check mb-2">
         <input asp-for="IsPublic" class="form-check-input"/>
-        <label asp-for="IsPublic" class="form-check-label">Публичный документ</label>
+        <label asp-for="IsPublic" class="form-check-label mb-2">Публичный документ</label>
     </div>
-    <button type="submit" class="btn btn-primary">Сохранить</button>
-    <a href="/Document/Index" class="btn btn-secondary">Назад</a>
-
-    <button type="button" id="generate-link-btn" class="btn btn-info">Сгенерировать ссылку</button>
-
-    <button type="button" id="add-user-btn" class="btn btn-success" data-toggle="modal" data-target="#addUserModal">Добавить пользователя</button>
+    <div class="d-flex justify-content-between">
+        <div>
+            <button type="submit" class="btn btn-primary me-1">Сохранить</button>
+            <a href="/Document/Index" class="btn btn-danger">Назад</a>
+        </div>
+        <div>
+            <button type="button" id="generate-link-btn" class="btn btn-primary me-1">Сгенерировать ссылку</button>
+            <button type="button" id="add-user-btn" class="btn btn-primary" data-toggle="modal" data-target="#addUserModal">Добавить пользователя</button>
+        </div>
+    </div>
 </form>
 
 <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="addUserModalLabel">Добавить пользователя</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
+            <div class="modal-body modal-color">
+                <h4 class="mb-3">Добавить пользователя</h4>
                 <form id="add-user-form">
                     <div class="form-group">
-                        <label for="username">Имя пользователя</label>
-                        <input type="text" class="form-control" id="username" name="username" required />
+                        <p class="mb-1">Имя пользователя</p>
+                        <input type="text" class="form-control mb-2" id="username" name="username" required/>
                     </div>
                     <div class="form-group">
-                        <label for="accessLevel">Уровень доступа</label>
-                        <select class="form-control" id="accessLevel" name="accessLevel">
+                        <p class="mb-1">Уровень доступа</p>
+                        <select class="form-control mb-3" id="accessLevel" name="accessLevel">
                             <option value="Reader">Читатель</option>
                             <option value="Editor">Редактор</option>
                         </select>
                     </div>
                 </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Закрыть</button>
+                <button type="button" class="btn btn-danger me-1" data-dismiss="modal">Закрыть</button>
                 <button type="button" id="confirm-add-user-btn" class="btn btn-primary">Добавить</button>
             </div>
         </div>

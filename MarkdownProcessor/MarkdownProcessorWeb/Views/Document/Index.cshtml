@@ -7,51 +7,47 @@
     ViewData["Title"] = "Мои документы";
 }
 
-<h2>Мои документы</h2>
-
-<a href="/Document/Create" class="btn btn-primary">Создать документ</a>
-
-<table class="table mt-4">
-    <thead>
-    <tr>
-        <th></th>
-        <th></th>
-        <th></th>
-    </tr>
-    </thead>
-    <tbody>
+<h2 class="mb-3">Мои документы</h2>
+<div class="d-flex">
+    <a href="/Document/Create" class="btn btn-primary me-2">Создать документ</a>
+    <form asp-action="Logout" asp-controller="Account" method="post">
+        <button type="submit" class="btn btn-danger">Выйти</button>
+    </form>
+</div>
+<table class="mt-4 rounded-table tr-color w-100">
+    <tbody class="rounded-table">
     @foreach (var document in Model)
     {
-        <tr>
+        <tr class="rounded-table tbody tr">
             <td>
                 @if (document.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
                      || document.DocumentAccesses.Any(da =>
                          da.UserId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier))
                          && da.AccessLevel == AccessLevel.Editor))
                 {
-                    <a href="/Document/Edit/@document.Id">@document.Title</a>
+                    <strong><a class="text-decoration text-light-gray" href="/Document/Edit/@document.Id">@document.Title</a></strong>
                 }
                 else
                 {
-                    <a href="/Document/Read/@document.Id">@document.Title</a>
+                    <strong><a class="text-decoration text-light-gray" href="/Document/Read/@document.Id">@document.Title</a></strong>
                 }
             </td>
             <td>
                 @if (document.IsPublic)
                 {
-                    <p>Публичный</p>
+                    <strong><div class="text-light-gray ">Публичный</div></strong>
                 }
                 else
                 {
-                    <p>Приватный</p>
+                    <strong><div class="text-light-gray">Приватный</div></strong>
                 }
             </td>
-            <td>
+            <td class="text-right">
                 @if (document.AuthorId == int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)))
                 {
                     <form asp-action="Delete" asp-controller="Document" method="post" class="d-inline">
                         <input type="hidden" name="id" value="@document.Id"/>
-                        <button type="submit" class="btn btn-danger">Удалить</button>
+                        <button type="submit" class="btn btn-danger delete-btn">Удалить</button>
                     </form>
                 }
             </td>
@@ -59,9 +55,3 @@
     }
     </tbody>
 </table>
-
-<div class="mt-4">
-    <form asp-action="Logout" asp-controller="Account" method="post">
-        <button type="submit" class="btn btn-danger">Выйти</button>
-    </form>
-</div>

@@ -1,13 +1,16 @@
 ﻿@{
-    ViewData["Title"] = "Greeting";
+    ViewData["Title"] = "MarkdownProcessor";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Добро пожаловать!</h1>
-
-    <div class="mt-4">
-        <a href="/Account/Login" class="btn btn-primary btn-lg">Войти</a><br/>
-        <a href="/Account/Register" class="btn btn-secondary btn-lg">Зарегистрироваться</a><br/>
-        <a href="/Account/LoginWithGoogle" class="btn btn-danger btn-lg">Войти через Google</a><br/>
+<div class="d-flex justify-content-center align-items-center vh-custom">
+    <div class="text-center">
+        <h1>MarkdownProcessor</h1>
+        <div class="mt-4">
+            <div class="d-flex flex-column align-items-center width-button w-100">
+                <a href="/Account/Login" class="btn btn-primary btn-lg width-button mb-2">Войти</a>
+                <a href="/Account/Register" class="btn btn-primary btn-lg width-button mb-2">Зарегистрироваться</a>
+                <a href="/Account/LoginWithGoogle" class="btn btn-danger btn-lg width-button">Войти через Google</a>
+            </div>
+        </div>
     </div>
 </div>

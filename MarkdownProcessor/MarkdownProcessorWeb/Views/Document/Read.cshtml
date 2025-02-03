@@ -4,22 +4,23 @@
     ViewData["Title"] = "Просмотр документа";
 }
 
-<div class="form-group">
-    <h4><label asp-for="Title"></label></h4>
+<div class="form-group mb-2">
+    <h4><p class="mb-2">Название</p></h4>
     <input asp-for="Title" class="form-control" />
     <span asp-validation-for="Title" class="text-danger"></span>
 </div>
-<div class="row">
+<div class="row mb-2">
     <div class="col-md-6">
         <h4>Markdown</h4>
-        <textarea id="markdown-content" class="form-control" rows="16">@Model.Content</textarea>
+        <textarea id="markdown-content" class="form-control" style="height: 470px; overflow-y: auto">@Model.Content</textarea>
     </div>
     <div class="col-md-6">
         <h4>HTML</h4>
-        <pre id="html-content" class="form-control" style="height: 400px; overflow-y: auto; white-space: pre-wrap;"></pre>
+        <pre id="html-content" class="form-control" style="height: 470px; overflow-y: auto; white-space: pre-wrap;"></pre>
     </div>
 </div>
 
-<a href="/Document/Index" class="btn btn-secondary">Назад</a>
+<a href="/Document/Index" class="btn btn-danger">Назад</a>
 
 <script src="~/js/convertMdToHtml.js"></script>
+

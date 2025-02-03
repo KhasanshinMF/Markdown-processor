@@ -4,18 +4,24 @@
     ViewData["Title"] = "Создать документ";
 }
 
-<h2>Создать документ</h2>
-
-<form asp-action="Create" method="post">
-    <div class="form-group">
-        <label asp-for="Title"></label>
-        <input asp-for="Title" class="form-control" />
-        <span asp-validation-for="Title" class="text-danger"></span>
+<div class="d-flex justify-content-center align-items-center vh-custom">
+    <div class="text-center">
+        <h2>Создать документ</h2>
+        <form asp-action="Create" method="post">
+            <div class="form-group mb-1">
+                <p class="mb-1">Введите название</p>
+                <input asp-for="Title" class="form-control"/>
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+            <div class="form-group form-check mb-1">
+                <input asp-for="IsPublic" class="form-check-input"/>
+                <label asp-for="IsPublic" class="form-check-label">Публичный документ</label>
+            </div>
+            <input type="hidden" asp-for="Content" value="# Новый документ"/>
+            <div class="d-flex">
+                <button type="submit" class="btn btn-primary me-2">Создать</button>
+                <a href="/Document/Index" class="btn btn-danger">Назад</a>
+            </div>
+        </form>
     </div>
-    <div class="form-group form-check">
-        <input asp-for="IsPublic" class="form-check-input" />
-        <label asp-for="IsPublic" class="form-check-label">Публичный документ</label>
-    </div>
-    <input type="hidden" asp-for="Content" value="# Новый документ" />
-    <button type="submit" class="btn btn-primary">Создать</button>
-</form>
+</div>
